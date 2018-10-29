@@ -23,14 +23,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.uw.notifysettingdemo.MainActivity" />
         </activity>
-        <activity android:name="edu.uw.notifysettingdemo.SettingsActivity"
-            android:parentActivityName="edu.uw.notifysettingdemo.MainActivity">
-            <!-- for action bar back -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.uw.notifysettingdemo.MainActivity" />
-        </activity>
-
 
     </application>
 
