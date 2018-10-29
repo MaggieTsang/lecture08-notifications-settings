@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     .setSmallIcon(R.drawable.ic_thumb_down)
                     .setContentTitle("You're on notice!")
                     .setContentText("This notice has been generated " + notifyCount + " times")
-                    .setChannel(NOTIFICATION_CHANNEL_ID);
+                    .setChannelId(NOTIFICATION_CHANNEL_ID);
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 //Orea support
