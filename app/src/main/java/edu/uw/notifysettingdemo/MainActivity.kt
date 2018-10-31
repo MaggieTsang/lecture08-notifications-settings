@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.provider.Settings
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.NotificationCompat
@@ -18,11 +17,10 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
-    val TAG = "MainActivity"
+    private val TAG = "MainActivity"
 
     private val NOTIFICATION_CHANNEL_ID = "my_channel_01" //channel ID
     private val NOTIFICATION_REQUEST = 1
@@ -34,20 +32,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
-        val prefs = getSharedPreferences("TestPrefs", Context.MODE_PRIVATE)
-        notifyCount = prefs.getInt(NOTIFY_COUNT_KEY, 0)
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        //save some details when app stops
-        val prefs = getSharedPreferences("TestPrefs", Context.MODE_PRIVATE)
-        val editor = prefs.edit()
-        editor.putInt(NOTIFY_COUNT_KEY, notifyCount)
-        editor.commit()
     }
 
     //to handle the launch button
@@ -61,40 +45,33 @@ class MainActivity : AppCompatActivity() {
 
         notifyCount++
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        if (prefs.getBoolean("pref_notify", true)) {
-
-            val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_thumb_down)
-                    .setContentTitle("You're on notice!")
-                    .setContentText("This notice has been generated $notifyCount times")
+        val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_thumb_down)
+                .setContentTitle("You're on notice!")
+                .setContentText("This notice has been generated $notifyCount times")
 
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                //Oreo support
-                val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, "Demo channel", NotificationManager.IMPORTANCE_HIGH)
-                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(channel)
-            } else {
-                //everything else!
-                builder.setPriority(NotificationCompat.PRIORITY_HIGH)
-                builder.setVibrate(longArrayOf(0, 500, 500, 5000))
-                builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
-            }
-
-            val intent = Intent(this, SecondActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_REQUEST, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-            builder.setContentIntent(pendingIntent)
-
-            //val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val notificationManager = NotificationManagerCompat.from(this)
-            notificationManager.notify(DEMO_NOTIFICATION_ID, builder.build()) //post the notification!
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            //Oreo support
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, "Demo channel", NotificationManager.IMPORTANCE_HIGH)
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        } else {
+            //everything else!
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH)
+            builder.setVibrate(longArrayOf(0, 500, 500, 5000))
+            builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
         }
-        else {
-            //notifications turned off!
-            Toast.makeText(this, "This notice has been generated $notifyCount times", Toast.LENGTH_LONG).show()
-        }
+
+        val intent = Intent(this, SecondActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_REQUEST, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        builder.setContentIntent(pendingIntent)
+
+        //val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = NotificationManagerCompat.from(this)
+        notificationManager.notify(DEMO_NOTIFICATION_ID, builder.build()) //post the notification!
+
     }
 
 
@@ -152,13 +129,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.menu_item_settings -> {
                 Log.d(TAG, "Settings menu pressed")
-                startActivity(Intent(this, SettingsActivity::class.java))
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }
